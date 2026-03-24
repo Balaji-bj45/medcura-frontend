@@ -148,7 +148,7 @@ export default function ProductsPage() {
         <h1 className="heading-font text-2xl font-semibold text-slate-900">Products</h1>
         <Link
           to="/admin/products/new"
-          className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+          className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold !text-white"
         >
           Add Product
         </Link>
