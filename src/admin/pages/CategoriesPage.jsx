@@ -10,7 +10,6 @@ import { useToast } from '../../context/ToastContext.jsx'
 
 const initialForm = {
   name: '',
-  icon: MEDCURA_CATEGORIES[0].icon,
   description: MEDCURA_CATEGORIES[0].description,
   sortOrder: 1,
 }
@@ -49,7 +48,6 @@ export default function CategoriesPage() {
     }
     setForm({
       name: selected.name,
-      icon: selected.icon,
       description: selected.description,
       sortOrder: selected.sortOrder || 1,
     })
@@ -115,12 +113,6 @@ export default function CategoriesPage() {
               <option key={item.name} value={item.name} />
             ))}
           </datalist>
-          <input
-            value={form.icon}
-            onChange={(event) => setForm((prev) => ({ ...prev, icon: event.target.value }))}
-            placeholder="Icon name"
-            className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
-          />
           <input
             type="number"
             min="1"

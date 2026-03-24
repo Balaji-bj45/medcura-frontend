@@ -573,35 +573,7 @@ function AboutRoadmap() {
           className="mb-16 text-center"
         >
           {/* Animated header SVG */}
-          <Motion.svg
-            width="48"
-            height="48"
-            viewBox="0 0 48 48"
-            fill="none"
-            className="mx-auto mb-5"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <Motion.circle
-              cx="24"
-              cy="24"
-              r="22"
-              stroke="#bce8f2"
-              strokeWidth="2"
-              variants={draw}
-              custom={0}
-            />
-            <Motion.path
-              d="M14 24L21 31L34 18"
-              stroke="#0e336b"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              variants={draw}
-              custom={1}
-            />
-          </Motion.svg>
+         
 
           <h3 className="heading-font text-3xl font-bold text-[#0e336b] md:text-5xl">
             Our Journey
