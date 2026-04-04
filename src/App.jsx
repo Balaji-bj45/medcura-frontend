@@ -8,7 +8,6 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { CartProvider } from './context/CartContext.jsx'
 import { ToastProvider } from './context/ToastContext.jsx'
 import LoginPage from './pages/LoginPage.jsx'
-import VerifyOtpPage from './pages/VerifyOtpPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import AboutPage from './pages/AboutPage.jsx'
 import CarePage from './pages/CarePage.jsx'
@@ -16,6 +15,7 @@ import ContactPage from './pages/ContactPage.jsx'
 import ProductListPage from './pages/ProductListPage.jsx'
 import ProductDetailsPage from './pages/ProductDetailsPage.jsx'
 import CartPage from './pages/CartPage.jsx'
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx'
 import CheckoutPage from './pages/CheckoutPage.jsx'
 import OrdersPage from './pages/OrdersPage.jsx'
 import OrderSuccessPage from './pages/OrderSuccessPage.jsx'
@@ -71,7 +71,7 @@ function AppRoutes() {
       <Route path="/care" element={<CarePage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/verify-otp" element={<VerifyOtpPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/products" element={<ProductListPage />} />
       <Route path="/products/:id" element={<ProductDetailsPage />} />
       <Route path="/cart" element={<CartPage />} />

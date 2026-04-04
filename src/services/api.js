@@ -57,7 +57,6 @@ api.interceptors.response.use(
       if (hadToken) {
         localStorage.removeItem('medcura_token')
         localStorage.removeItem('medcura_customer')
-        localStorage.removeItem('medcura_otp_context')
         if (window.location.pathname !== '/login') {
           window.location.href = '/login'
         }

@@ -35,7 +35,6 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(CUSTOMER_KEY)
-    localStorage.removeItem('medcura_otp_context')
     setToken(null)
     setCustomer(null)
   }
