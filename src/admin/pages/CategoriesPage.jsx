@@ -7,11 +7,22 @@ import {
 } from '../services/adminCategoryService.js'
 import { MEDCURA_CATEGORIES } from '../../constants/catalog.js'
 import { useToast } from '../../context/ToastContext.jsx'
+import ConfirmModal from '../../shared/components/ConfirmModal.jsx'
 
 const initialForm = {
   name: '',
   description: MEDCURA_CATEGORIES[0].description,
   sortOrder: 1,
+}
+
+function buildCategoryPayload(values, overrides = {}) {
+  return {
+    name: values.name.trim(),
+    description: values.description?.trim() || '',
+    sortOrder: Number(values.sortOrder || 0),
+    isActive: values.isActive ?? true,
+    ...overrides,
+  }
 }
 
 export default function CategoriesPage() {
@@ -20,6 +31,9 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState(initialForm)
+  const [editingId, setEditingId] = useState(null)
+  const [statusUpdatingId, setStatusUpdatingId] = useState(null)
+  const [deleteId, setDeleteId] = useState(null)
 
   const load = async () => {
     setLoading(true)
@@ -53,41 +67,80 @@ export default function CategoriesPage() {
     })
   }
 
-  const handleCreate = async (event) => {
+  const resetForm = () => {
+    setForm(initialForm)
+    setEditingId(null)
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault()
     setSubmitting(true)
     try {
-      await createAdminCategory({
-        ...form,
-        name: form.name.trim(),
-        sortOrder: Number(form.sortOrder || 0),
-      })
-      addToast('Category added successfully.', 'success')
+      const payload = buildCategoryPayload(form)
+
+      if (editingId) {
+        await updateAdminCategory(editingId, payload)
+        addToast('Category updated successfully.', 'success')
+      } else {
+        await createAdminCategory(payload)
+        addToast('Category added successfully.', 'success')
+      }
+
+      resetForm()
       await load()
     } catch (err) {
-      addToast(err.response?.data?.message || 'Unable to add category.', 'error')
+      addToast(
+        err.response?.data?.message ||
+          `Unable to ${editingId ? 'update' : 'add'} category.`,
+        'error'
+      )
     } finally {
       setSubmitting(false)
     }
   }
 
-  const handleDeactivate = async (categoryId) => {
+  const handleEdit = (category) => {
+    setEditingId(category._id)
+    setForm({
+      name: category.name || '',
+      description: category.description || '',
+      sortOrder: category.sortOrder ?? 1,
+      isActive: category.isActive ?? true,
+    })
+  }
+
+  const handleDelete = async () => {
+    if (!deleteId) return
+
     try {
-      await deleteAdminCategory(categoryId)
-      addToast('Category deactivated.', 'success')
+      await deleteAdminCategory(deleteId)
+      addToast('Category deleted successfully.', 'success')
+      if (editingId === deleteId) {
+        resetForm()
+      }
+      setDeleteId(null)
       await load()
     } catch (err) {
-      addToast(err.response?.data?.message || 'Unable to deactivate category.', 'error')
+      addToast(err.response?.data?.message || 'Unable to delete category.', 'error')
     }
   }
 
-  const handleActivate = async (category) => {
+  const handleStatusChange = async (category, nextStatus) => {
+    const nextIsActive = nextStatus === 'active'
+    if (Boolean(category.isActive) === nextIsActive) return
+
+    setStatusUpdatingId(category._id)
     try {
-      await updateAdminCategory(category._id, { isActive: true, name: category.name })
-      addToast('Category activated.', 'success')
+      await updateAdminCategory(
+        category._id,
+        buildCategoryPayload(category, { isActive: nextIsActive })
+      )
+      addToast(`Category ${nextIsActive ? 'activated' : 'deactivated'} successfully.`, 'success')
       await load()
     } catch (err) {
-      addToast(err.response?.data?.message || 'Unable to activate category.', 'error')
+      addToast(err.response?.data?.message || 'Unable to update category status.', 'error')
+    } finally {
+      setStatusUpdatingId(null)
     }
   }
 
@@ -98,7 +151,7 @@ export default function CategoriesPage() {
         <p className="mt-1 text-sm text-slate-600">Manage storefront product categories.</p>
       </div>
 
-      <form onSubmit={handleCreate} className="rounded-2xl border border-slate-200 bg-white p-4">
+      <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-4">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <input
             value={form.name}
@@ -126,7 +179,7 @@ export default function CategoriesPage() {
             disabled={submitting}
             className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
-            {submitting ? 'Adding...' : 'Add Category'}
+            {submitting ? (editingId ? 'Saving...' : 'Adding...') : editingId ? 'Update Category' : 'Add Category'}
           </button>
         </div>
         <textarea
@@ -136,6 +189,17 @@ export default function CategoriesPage() {
           className="mt-3 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
           placeholder="Description"
         />
+        {editingId ? (
+          <div className="mt-3 flex justify-end">
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
+            >
+              Cancel Edit
+            </button>
+          </div>
+        ) : null}
       </form>
 
       <div className="rounded-2xl border border-slate-200 bg-white">
@@ -161,32 +225,35 @@ export default function CategoriesPage() {
                     </td>
                     <td className="px-4 py-3 text-slate-700">{category.sortOrder}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      <select
+                        value={category.isActive ? 'active' : 'inactive'}
+                        onChange={(event) => handleStatusChange(category, event.target.value)}
+                        disabled={statusUpdatingId === category._id}
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-semibold ${
                           category.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'
-                        }`}
+                        } disabled:cursor-not-allowed disabled:opacity-60`}
                       >
-                        {category.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
                     </td>
                     <td className="px-4 py-3">
-                      {category.isActive ? (
+                      <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => handleDeactivate(category._id)}
+                          onClick={() => handleEdit(category)}
+                          className="rounded-full border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteId(category._id)}
                           className="rounded-full border border-red-300 px-3 py-1 text-xs font-semibold text-red-600"
                         >
-                          Deactivate
+                          Delete
                         </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleActivate(category)}
-                          className="rounded-full border border-emerald-300 px-3 py-1 text-xs font-semibold text-emerald-700"
-                        >
-                          Activate
-                        </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -201,6 +268,15 @@ export default function CategoriesPage() {
           Preset categories remaining: {remainingOptions.map((item) => item.name).join(', ')}
         </p>
       ) : null}
+
+      <ConfirmModal
+        open={Boolean(deleteId)}
+        title="Delete category"
+        description="This will permanently remove the category from the database."
+        confirmLabel="Delete"
+        onCancel={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+      />
     </section>
   )
 }

@@ -12,6 +12,7 @@ function getFallbackCategory(name) {
 function ShopByCategory() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadFailed, setLoadFailed] = useState(false)
 
   useEffect(() => {
     let ignore = false
@@ -19,7 +20,12 @@ function ShopByCategory() {
     getCategories()
       .then((data) => {
         if (ignore) return
+        setLoadFailed(false)
         setCategories(Array.isArray(data) ? data : [])
+      })
+      .catch(() => {
+        if (ignore) return
+        setLoadFailed(true)
       })
       .finally(() => {
         if (!ignore) setLoading(false)
@@ -32,8 +38,8 @@ function ShopByCategory() {
 
   const visibleCategories = useMemo(() => {
     const fromApi = categories.filter((item) => item?.isActive !== false)
-    return fromApi.length > 0 ? fromApi : MEDCURA_CATEGORIES
-  }, [categories])
+    return loadFailed ? MEDCURA_CATEGORIES : fromApi
+  }, [categories, loadFailed])
 
   return (
     <section className="bg-white px-4 py-16 sm:px-6 lg:px-10 lg:py-20">

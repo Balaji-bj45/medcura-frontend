@@ -74,12 +74,12 @@ export default function Hero() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-5xl leading-[1.3] tracking-tight text-[#0e336b] sm:text-6xl lg:text-7xl"
+              className="text-4xl leading-[1.3] tracking-tight text-[#0e336b] sm:text-5xl lg:text-6xl"
             >
               <span className="font-medium"> Medical Equipment</span> <br />
               <span className="font-black">
                 <span className="bg-gradient-to-r from-[#3dcbe5]/30 to-transparent px-2 decoration-clone leading-[1.3]">
-                  for Home, Clinics, & Hospitals
+                  for Hospitals, Clinics&Home
                 </span>
               </span>
             </Motion.h1>

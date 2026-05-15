@@ -109,7 +109,7 @@ export default function ProductsPage() {
   const handleDelete = async () => {
     if (!deleteId) return
     await deleteAdminProduct(deleteId)
-    addToast('Product deactivated successfully.', 'success')
+    addToast('Product deleted successfully.', 'success')
     setDeleteId(null)
     await loadProducts()
   }
@@ -337,9 +337,9 @@ export default function ProductsPage() {
 
       <ConfirmModal
         open={Boolean(deleteId)}
-        title="Deactivate product"
-        description="This will mark the product as inactive. You can reactivate it later."
-        confirmLabel="Deactivate"
+        title="Delete product"
+        description="This will permanently remove the product from the database."
+        confirmLabel="Delete"
         onCancel={() => setDeleteId(null)}
         onConfirm={handleDelete}
       />

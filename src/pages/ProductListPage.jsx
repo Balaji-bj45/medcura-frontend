@@ -91,23 +91,30 @@ function useProducts(filters) {
 
 function useCategories() {
   const [categories, setCategories] = useState([])
+  const [loadFailed, setLoadFailed] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
 
     getCategories({ signal: controller.signal })
-      .then((data) => setCategories(Array.isArray(data) ? data : []))
-      .catch(() => setCategories(MEDCURA_CATEGORIES))
+      .then((data) => {
+        setLoadFailed(false)
+        setCategories(Array.isArray(data) ? data : [])
+      })
+      .catch(() => {
+        setLoadFailed(true)
+        setCategories([])
+      })
 
     return () => controller.abort()
   }, [])
 
   const activeCategories = useMemo(
     () =>
-      categories.filter((item) => item?.isActive !== false).length > 0
-        ? categories.filter((item) => item?.isActive !== false)
-        : MEDCURA_CATEGORIES,
-    [categories]
+      loadFailed
+        ? MEDCURA_CATEGORIES
+        : categories.filter((item) => item?.isActive !== false),
+    [categories, loadFailed]
   )
 
   return activeCategories
