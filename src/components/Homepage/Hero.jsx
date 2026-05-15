@@ -79,7 +79,7 @@ export default function Hero() {
               <span className="font-medium"> Medical Equipment</span> <br />
               <span className="font-black">
                 <span className="bg-gradient-to-r from-[#3dcbe5]/30 to-transparent px-2 decoration-clone leading-[1.3]">
-                  for Hospitals, Clinics&Home
+                  for Hospitals, Clinics & Home
                 </span>
               </span>
             </Motion.h1>

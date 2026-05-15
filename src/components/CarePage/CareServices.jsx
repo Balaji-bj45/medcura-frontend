@@ -124,7 +124,7 @@ function CareServices() {
 
             {/* Quick Features */}
             <div className="space-y-3 mb-8">
-              {['Same-day setup available', '24/7 technical support', 'Professional installation'].map((item, i) => (
+              {['24/7 technical support','Verified Staffs', 'Anytime Care'].map((item, i) => (
                 <Motion.div
                   key={item}
                   className="flex items-center gap-3"

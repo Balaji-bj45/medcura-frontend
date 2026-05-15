@@ -64,7 +64,7 @@ export default function CareHero() {
               transition={{ delay: 0.3 }}
               className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-[#0e336b]/80"
             >
-              {['Comprehensive Healthcare', 'Critical Care Setups', 'Long-term Recovery'].map((item) => (
+              {['24/7 Support', 'Verified Staff', 'Anytime Care'].map((item) => (
                   <div key={item} className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-[#3dcbe5]" />
                       {item}
