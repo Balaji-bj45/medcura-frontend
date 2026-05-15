@@ -2,7 +2,9 @@ import adminApi from './adminApi.js'
 
 export async function getAdminProducts() {
   const response = await adminApi.get('/api/products/admin/all')
-  return response.data?.data || []
+  const data = response.data?.data
+  if (Array.isArray(data)) return data
+  return data?.items || []
 }
 
 export async function getAdminProductById(id) {

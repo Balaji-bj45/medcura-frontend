@@ -26,6 +26,15 @@ const adminApi = axios.create({
   },
 })
 
+function isIgnoredRequestError(error) {
+  return (
+    axios.isCancel(error) ||
+    error?.code === 'ERR_CANCELED' ||
+    error?.name === 'CanceledError' ||
+    error?.name === 'AbortError'
+  )
+}
+
 adminApi.interceptors.request.use((config) => {
   const token = localStorage.getItem(ADMIN_TOKEN_KEY)
   if (token) {
@@ -37,6 +46,10 @@ adminApi.interceptors.request.use((config) => {
 adminApi.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (isIgnoredRequestError(error)) {
+      return Promise.reject(error)
+    }
+
     const message =
       error.response?.data?.message ||
       error.message ||

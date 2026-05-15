@@ -124,7 +124,7 @@ export default function ProductDetailsPage() {
       .then((data) => {
         if (ignore) return
 
-        const items = Array.isArray(data) ? data : []
+        const items = Array.isArray(data?.items) ? data.items : []
         const filtered = items.filter((item) => (item._id || item.id) !== id).slice(0, 4)
         setRelatedProducts(filtered)
       })

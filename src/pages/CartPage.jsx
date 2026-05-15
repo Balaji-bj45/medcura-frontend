@@ -74,7 +74,7 @@ export default function CartPage() {
   const subtotal = useMemo(() => {
     return items.reduce((total, item) => total + getItemPrice(item) * (item.quantity || 1), 0)
   }, [items])
-  const delivery = subtotal >= 15000 ? 0 : items.length ? 0 : 0
+  const delivery = subtotal >= 15000 ? 0 : items.length ? 350 : 0
   const tax = Number((subtotal * 0.05).toFixed(2))
   const total = Number((subtotal + tax + delivery).toFixed(2))
 

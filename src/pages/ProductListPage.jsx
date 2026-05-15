@@ -6,6 +6,8 @@ import { getProducts } from '../services/products.js'
 import { getCategories } from '../services/categories.js'
 import { MEDCURA_CATEGORIES } from '../constants/catalog.js'
 
+const PAGE_SIZE = 12
+
 const sortOptions = [
   { value: 'latest', label: 'Latest' },
   { value: 'popular', label: 'Most Popular' },
@@ -17,6 +19,7 @@ const sortOptions = [
 // Custom hook for managing search params
 function useProductFilters() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const parsedPage = Number.parseInt(searchParams.get('page') || '1', 10)
 
   const filters = useMemo(
     () => ({
@@ -24,8 +27,9 @@ function useProductFilters() {
       sort: searchParams.get('sort') || 'latest',
       search: searchParams.get('search') || '',
       featured: searchParams.get('featured') || '',
+      page: Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1,
     }),
-    [searchParams]
+    [parsedPage, searchParams]
   )
 
   const updateFilter = (key, value) => {
@@ -33,6 +37,9 @@ function useProductFilters() {
       (prev) => {
         const next = new URLSearchParams(prev)
         value ? next.set(key, value) : next.delete(key)
+        if (key !== 'page') {
+          next.delete('page')
+        }
         return next
       },
       { replace: true }
@@ -44,7 +51,13 @@ function useProductFilters() {
 
 // Custom hook for fetching data
 function useProducts(filters) {
-  const [products, setProducts] = useState([])
+  const [productCollection, setProductCollection] = useState({
+    items: [],
+    total: 0,
+    page: 1,
+    pageSize: PAGE_SIZE,
+    hasMore: false,
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -59,20 +72,21 @@ function useProducts(filters) {
       sort: filters.sort,
       search: filters.search || undefined,
       featured: filters.featured || undefined,
-      signal: controller.signal,
-    })
-      .then((data) => setProducts(Array.isArray(data) ? data : []))
+      page: filters.page,
+      pageSize: PAGE_SIZE,
+    }, { signal: controller.signal })
+      .then((data) => setProductCollection(data))
       .catch((err) => {
-        if (err.name !== 'AbortError') {
+        if (err.name !== 'AbortError' && err.code !== 'ERR_CANCELED') {
           setError(err.response?.data?.message || 'Failed to load products.')
         }
       })
       .finally(() => setLoading(false))
 
     return () => controller.abort()
-  }, [filters.category, filters.featured, filters.search, filters.sort])
+  }, [filters.category, filters.featured, filters.page, filters.search, filters.sort])
 
-  return { products, loading, error }
+  return { productCollection, loading, error }
 }
 
 function useCategories() {
@@ -187,11 +201,47 @@ function ProductGrid({ products, loading, error }) {
   )
 }
 
+function Pagination({ page, total, pageSize, hasMore, onChange }) {
+  if (total <= pageSize) return null
+
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+
+  return (
+    <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-[#c9ecf3] bg-white px-4 py-4 text-sm text-[#0e336b]/70 sm:flex-row sm:items-center sm:justify-between">
+      <p>
+        Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, total)} of {total} products
+      </p>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          disabled={page <= 1}
+          onClick={() => onChange(page - 1)}
+          className="rounded-full border border-[#bdeaf2] px-4 py-2 font-semibold text-[#0e336b] transition hover:bg-[#edfafe] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span className="min-w-20 text-center font-semibold text-[#0e336b]">
+          Page {page} / {totalPages}
+        </span>
+        <button
+          type="button"
+          disabled={!hasMore}
+          onClick={() => onChange(page + 1)}
+          className="rounded-full border border-[#bdeaf2] px-4 py-2 font-semibold text-[#0e336b] transition hover:bg-[#edfafe] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // Main component
 export default function ProductListPage() {
   const { filters, updateFilter } = useProductFilters()
-  const { products, loading, error } = useProducts(filters)
+  const { productCollection, loading, error } = useProducts(filters)
   const categories = useCategories()
+  const products = productCollection.items
 
   return (
     <section className="bg-[#f8fdff] px-4 py-8 sm:px-6 lg:px-10">
@@ -215,6 +265,13 @@ export default function ProductListPage() {
         </div>
 
         <ProductGrid products={products} loading={loading} error={error} />
+        <Pagination
+          page={productCollection.page}
+          total={productCollection.total}
+          pageSize={productCollection.pageSize}
+          hasMore={productCollection.hasMore}
+          onChange={(value) => updateFilter('page', String(value))}
+        />
       </div>
     </section>
   )
