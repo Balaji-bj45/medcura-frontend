@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion as Motion } from 'framer-motion'
+import { primaryContactNumber } from '../../constants/contact.js'
 
 function CareCta() {
   return (
@@ -22,7 +23,7 @@ function CareCta() {
             Request Home ICU Setup
           </Link>
           <a
-            href="tel:+918778790244"
+            href={primaryContactNumber.href}
             className="rounded-full border border-white/50 px-6 py-3 text-sm font-semibold !text-white"
           >
             Call Care Desk

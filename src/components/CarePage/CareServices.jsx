@@ -1,5 +1,6 @@
 import { motion as Motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { primaryContactNumber } from '../../constants/contact.js'
 
 // Central Animated Heart
 const CentralHeart = () => (
@@ -155,7 +156,7 @@ function CareServices() {
                 </svg>
               </Link>
               <a
-                href="tel:+918778790244"
+                href={primaryContactNumber.href}
                 className="flex items-center gap-2 border-2 border-[#0e336b]/10 text-[#0e336b] px-7 py-3.5 rounded-full font-semibold hover:border-[#48d1e9] transition-all"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

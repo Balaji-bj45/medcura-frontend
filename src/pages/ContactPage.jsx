@@ -2,6 +2,12 @@
 import { submitServiceEnquiry } from '../services/enquiries.js'
 import { useToast } from '../context/ToastContext.jsx'
 import { Phone, Mail, MapPin, MessageCircle } from 'lucide-react'
+import {
+  contactNumbers,
+  officeAddressLines,
+  officeMapQuery,
+  whatsappNumber,
+} from '../constants/contact.js'
 
 const initialForm = {
   name: '',
@@ -198,7 +204,7 @@ export default function ContactPage() {
             
             <div className="space-y-4">
                 <a
-                    href="https://wa.me/918778790244"
+                    href={`https://wa.me/${whatsappNumber}`}
                     target="_blank"
                     rel="noreferrer" 
                     className="flex w-full items-center justify-center rounded-full bg-[#0e336b] py-4 font-semibold text-white transition hover:bg-[#0d2548]"
@@ -225,9 +231,13 @@ export default function ContactPage() {
             </div>
             <h3 className="text-lg font-bold text-[#0e336b]">Phone</h3>
             <p className="mt-2 text-sm text-[#0e336b]/70">Call for rapid response</p>
-            <a href="tel:+918778790244" className="mt-1 font-semibold text-[#0e336b] hover:underline">
-              +91 87787 90244
-            </a>
+            <div className="mt-1 flex flex-col gap-1">
+              {contactNumbers.map((phone) => (
+                <a key={phone.raw} href={phone.href} className="font-semibold text-[#0e336b] hover:underline">
+                  {phone.label}
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Email Card */}
@@ -249,7 +259,7 @@ export default function ContactPage() {
             </div>
             <h3 className="text-lg font-bold text-[#0e336b]">Headquarters</h3>
             <p className="mt-2 text-sm text-[#0e336b]/70">
-              Alsa Mall Complex,<br />Egmore, Chennai - 600008
+              {officeAddressLines[0]}<br />{officeAddressLines[1]}
             </p>
           </div>
 
@@ -269,7 +279,7 @@ export default function ContactPage() {
 
                 <iframe
                     title="MedCura Location"
-                    src="https://www.google.com/maps?q=Alsa+Mall+Complex+Egmore+Chennai+600008&output=embed"
+                    src={`https://www.google.com/maps?q=${officeMapQuery}&output=embed`}
                     className="h-full w-full border-0"
                     allowFullScreen=""
                     loading="lazy"

@@ -1,6 +1,7 @@
 ﻿import { motion as Motion } from 'framer-motion'
 import { ArrowRight, Phone, CheckCircle2 } from 'lucide-react'
 import aboutbg from '../../assets/aboutbg11.png'
+import { primaryContactNumber } from '../../constants/contact.js'
 
 export default function HeroTypographyAlt() {
   return (
@@ -84,7 +85,7 @@ export default function HeroTypographyAlt() {
                 <ArrowRight className="h-5 w-5" />
               </button>
               
-              <a href="tel:+918778790244" className="flex h-14 items-center gap-3 rounded-full bg-white px-8 text-base font-bold text-[#0e336b] shadow-sm ring-1 ring-[#0e336b]/10 transition-colors hover:bg-[#f0f9fa] hover:text-[#0e336b]">
+              <a href={primaryContactNumber.href} className="flex h-14 items-center gap-3 rounded-full bg-white px-8 text-base font-bold text-[#0e336b] shadow-sm ring-1 ring-[#0e336b]/10 transition-colors hover:bg-[#f0f9fa] hover:text-[#0e336b]">
                 <Phone className="h-5 w-5 text-[#3dcbe5]" />
                 Call Now
               </a>

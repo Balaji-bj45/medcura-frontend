@@ -1,5 +1,7 @@
 ﻿import { Link } from 'react-router-dom'
 
+import { contactNumbers } from '../constants/contact.js'
+
 const quickLinks = [
   { label: 'Home', to: '/' },
   { label: 'About', to: '/about' },
@@ -29,9 +31,11 @@ export default function Footer() {
             <a href="mailto:support@medcura.com" className="transition hover:text-[#bfeefa]">
               support@medcura.com
             </a>
-            <a href="tel:+918778790244" className="transition hover:text-[#bfeefa]">
-              +91 87787 90244
-            </a>
+            {contactNumbers.map((phone) => (
+              <a key={phone.raw} href={phone.href} className="transition hover:text-[#bfeefa]">
+                {phone.label}
+              </a>
+            ))}
             <p>Mon-Sat, 9:00 AM - 8:00 PM</p>
           </div>
         </section>
